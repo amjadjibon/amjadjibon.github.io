@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Active navigation highlighting
+    // Active navigation highlighting with enhanced intersection observer
     const sections = document.querySelectorAll('section');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -29,45 +29,148 @@ document.addEventListener('DOMContentLoaded', function() {
                     activeLink.classList.add('active');
                 }
                 
-                // Add visible class to section for animation
+                // Add visible class to section for animation with stagger effect
                 entry.target.classList.add('visible');
+                
+                // Animate child elements with stagger
+                const animatedElements = entry.target.querySelectorAll('.experience-item, .project-card, .skill-category');
+                animatedElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
             }
         });
     }, {
-        threshold: 0.3
+        threshold: 0.2,
+        rootMargin: '-50px 0px'
     });
 
     sections.forEach(section => {
         observer.observe(section);
     });
 
-    // Scroll progress indicator
+    // Enhanced scroll progress indicator
     const scrollIndicator = document.getElementById('scrollIndicator');
-    window.addEventListener('scroll', () => {
+    let ticking = false;
+    
+    function updateScrollProgress() {
         const scrollTop = window.pageYOffset;
         const docHeight = document.body.scrollHeight - window.innerHeight;
-        const scrollPercent = (scrollTop / docHeight) * 100;
+        const scrollPercent = Math.min((scrollTop / docHeight) * 100, 100);
         scrollIndicator.style.width = scrollPercent + '%';
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateScrollProgress);
+            ticking = true;
+        }
     });
 
-    // Add some interactive animations
+    // Enhanced skill tag interactions
     const skillTags = document.querySelectorAll('.skill-tag');
     skillTags.forEach(tag => {
         tag.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.1) rotate(2deg)';
+            this.style.transform = 'translateY(-4px) scale(1.05)';
+            this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
         });
         tag.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1) rotate(0deg)';
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '';
         });
     });
 
-    // Parallax effect for header
-    window.addEventListener('scroll', () => {
+    // Optimized parallax effect for header
+    let headerParallax = 0;
+    function updateParallax() {
         const scrolled = window.pageYOffset;
-        const rate = scrolled * -0.5;
+        const rate = scrolled * -0.3;
         const header = document.querySelector('header');
-        if (header) {
+        if (header && scrolled < window.innerHeight) {
             header.style.transform = `translateY(${rate}px)`;
         }
+        headerParallax = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!headerParallax) {
+            requestAnimationFrame(updateParallax);
+            headerParallax = true;
+        }
     });
-}); 
+
+    // Add loading animation to images and cards
+    const cards = document.querySelectorAll('.experience-item, .project-card, .skill-category');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    });
+
+    // Enhanced project card interactions
+    const projectCards = document.querySelectorAll('.project-card');
+    projectCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Add subtle animation to contact items
+    const contactItems = document.querySelectorAll('.contact-item');
+    contactItems.forEach((item, index) => {
+        item.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Add intersection observer for experience items
+    const experienceItems = document.querySelectorAll('.experience-item');
+    const experienceObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 150);
+            }
+        });
+    }, {
+        threshold: 0.1
+    });
+
+    experienceItems.forEach(item => {
+        experienceObserver.observe(item);
+    });
+
+    // Add smooth navbar background transition on scroll
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            nav.style.background = 'rgba(255, 255, 255, 0.95)';
+            nav.style.backdropFilter = 'blur(10px)';
+        } else {
+            nav.style.background = 'var(--white)';
+            nav.style.backdropFilter = 'none';
+        }
+    });
+
+    // Add subtle hover effect to social links
+    const socialLinks = document.querySelectorAll('.social-link');
+    socialLinks.forEach(link => {
+        link.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-4px) scale(1.1)';
+        });
+        link.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Initialize all animations on load
+    setTimeout(() => {
+        document.body.classList.add('loaded');
+    }, 100);
+});
